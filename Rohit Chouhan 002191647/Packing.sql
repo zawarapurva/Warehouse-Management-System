@@ -1,0 +1,46 @@
+
+
+-----------------------------------------
+-----------------------------------------
+
+CREATE OR REPLACE FUNCTION TASK_PACK_TO_SHIP
+RETURN VARCHAR2
+AS
+IS_AVAILABLE VARCHAR2(100);
+IS_AVAILABLE1 VARCHAR2(100);
+CURSOR CUR_TASK
+   IS
+    SELECT
+        DISTINCT TASK_ID, DROP_ID
+    FROM
+        TASK_DETAIL
+    WHERE
+        STATUS = 'PACKING';
+
+BEGIN 
+
+FOR RCUR_TASK IN CUR_TASK
+   LOOP
+      BEGIN
+      
+         IS_AVAILABLE := RCUR_TASK.TASK_ID;
+        IS_AVAILABLE1 := RCUR_TASK.DROP_ID;
+         MERGE INTO TASK_DETAIL T
+         USING (SELECT DISTINCT TASK_ID FROM TASK_DETAIL WHERE STATUS = 'PACKING') E
+         ON (T.TASK_ID = E.TASK_ID)
+          WHEN MATCHED
+         THEN
+            UPDATE SET STATUS = 'SHIPPED'
+            WHERE STATUS = 'PACKING' AND TASK_ID = IS_AVAILABLE;    
+            
+            UPDATE DROPID
+            SET STATUS = 'AVAILABLE'
+            WHERE DROP_ID = IS_AVAILABLE1;
+DBMS_OUTPUT.PUT_LINE ('TASK COMPLETED');
+
+            
+             END;
+            END LOOP;
+    RETURN 'DONE';
+END;
+/
