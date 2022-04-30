@@ -1,0 +1,26 @@
+-------------------------------------------------------------------------------
+--DDL FOR RECEIPT (CREATE TABLE RECEIPT)
+-------------------------------------------------------------------------------
+
+DECLARE NB NUMBER;
+BEGIN
+    SELECT COUNT(*) INTO NB FROM USER_TABLES
+    WHERE TABLE_NAME = 'RECEIPT';
+
+    IF NB = 0 THEN
+        EXECUTE IMMEDIATE 'CREATE TABLE RECEIPT
+    (  RECEIPT_ID NUMBER NOT NULL,
+      PO_ID NUMBER NOT NULL,
+      STATUS VARCHAR(30) NOT NULL,
+      RECEIPT_DATE DATE NOT NULL,
+      CONSTRAINT PK_RECEIPT 
+      PRIMARY KEY(RECEIPT_ID),
+      CONSTRAINT FK_RECEIPT
+      FOREIGN KEY(PO_ID)
+      REFERENCES PURCHASE_ORDER(PO_ID) ON DELETE CASCADE
+      
+      )';
+    END IF;
+    DBMS_OUTPUT.PUT_LINE ('TABLE RECEIPT CREATED');
+END;
+/
